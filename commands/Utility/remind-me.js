@@ -19,9 +19,7 @@ module.exports = {
                 content: 'You are already on the list !\nYou can remove yourself from the list with the "stop" command.',
                 flags: MessageFlags.Ephemeral 
             });
-        }
-        // if the user isn't in the list
-            else {
+        } else {
             const back = new ButtonBuilder()
                 .setCustomId('back')
                 .setLabel('Back reminder')

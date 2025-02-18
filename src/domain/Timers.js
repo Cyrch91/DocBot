@@ -1,18 +1,17 @@
 module.exports = {
-    getInstance() {
-        return Timers.instance || (Timers.instance = new Timers());
-    }
-}
+    getInstance: Timers.getInstance,
+};
 
 class Timers {
     static instance;
   
     constructor() {
-        if (Timers.instance) {
-            throw new Error("Timers is a singleton and cannot be instantiated more than once.");
-        }
         Timers.instance = this;
         this.timers = {};
+    }
+
+    getInstance() {
+        return Timers.instance || (Timers.instance = new Timers());
     }
   
     setTimer(userName, callback, interval) {

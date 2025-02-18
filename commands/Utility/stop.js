@@ -13,7 +13,12 @@ module.exports = {
         console.log(usersToRemind);
         console.log(timers);
         
-        if (usersToRemind.back.includes(userName) || usersToRemind.water.includes(userName)) {
+        if (!usersToRemind.back.includes(userName) || !usersToRemind.water.includes(userName)) {
+            await interaction.reply({ 
+                content: 'You have not subscribe to the list yet, please use the "remind-me" command first.',
+                flags: MessageFlags.Ephemeral 
+            });
+        } else {
             if (userName in timers.timers) {
                 // Let the user choose between staying in the list or get out of it
                 const confirm = new ButtonBuilder()
@@ -71,11 +76,6 @@ module.exports = {
                     return;
                 }
             }
-        } else {
-            await interaction.reply({ 
-                content: 'You have not subscribe to the list yet, please use the "remind-me" command first.',
-                flags: MessageFlags.Ephemeral 
-            });
         }
     },
 }

@@ -1,10 +1,10 @@
 require('dotenv').config();
 require('dotenv').config({ path: './.env.local' });
-
+const { checkTimers } = require('./tools/checkTimers');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { Client, Collection, GatewayIntentBits} = require('discord.js');
+const { Client, Collection, GatewayIntentBits, PresenceUpdateStatus} = require('discord.js');
 
 const client = new Client({ 
     intents: [
@@ -12,7 +12,9 @@ const client = new Client({
         GatewayIntentBits.GuildMessages, 
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildExpressions,
-        GatewayIntentBits.DirectMessages
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildPresences
     ] 
 });
 
@@ -49,5 +51,9 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
+
+setInterval(() => {
+    checkTimers(client);
+}, 0.5 * 60 * 1000);
 
 client.login(process.env.TOKEN);

@@ -1,20 +1,20 @@
 const { SlashCommandBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const usersList = require("../../src/domain/UsersToRemind");
 
-const timersObject = require('../../src/domain/Timers');
-const timers = timersObject.getInstance();
+const { timers } = require('../../src/domain/Timers');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('remind-me')
-        .setDescription('Set a timer to remind you to straigthen your back and/or drink'),
+        .setDescription('Set a timer to remind you to straigthen your back and/or drink water.'),
     async execute(interaction) {
+        const userId = interaction.user.id;
         const userName = interaction.user.username;
-        const usersToRemind = usersList.getInstance();
-        console.log(usersToRemind);
+        const timersArray = timers.getTimers();
+        const isUserInList = timersArray.some(timer => timer.userId === userId);
+        console.log(isUserInList);
         
         // if user is in the list
-        if (usersToRemind.back.includes(userName) || usersToRemind.water.includes(userName)){
+        if (isUserInList) {
             await interaction.reply({ 
                 content: 'You are already on the list !\nYou can remove yourself from the list with the "stop" command.',
                 flags: MessageFlags.Ephemeral 
@@ -55,48 +55,25 @@ module.exports = {
                 
                 switch (userChoice.customId) {
                     case 'back':
-                        usersToRemind.back.push(userName);
                         await userChoice.update({ 
                             content: 'I will remind you to straighten your back every 30 minutes.',
                             components: [] });
-                        console.log(usersToRemind);
-
-                        // Set a timer to remind the user every 30 minutes
-                        const remindBack = async () => {
-                            await interaction.user.send('Remember to straighten your back!');
-                        };
-
-                        timers.setTimer(userName, remindBack, 30 * 60 * 1000);
-                        remindBack();
+                        
+                        timers.setTimer(userId, userName, 'back', interaction.locale);
                         break;
                     case 'water':
-                        usersToRemind.water.push(userName);
                         await userChoice.update({ 
                             content: 'I will remind you to drink every 30 minutes.',
                             components: [] });
-                        console.log(usersToRemind);
-
-                        const remindWater = async () => {
-                            await interaction.user.send('Remember to drink some water !');
-                        };
                         
-                        timers.setTimer(userName, remindWater, 30 * 60 * 1000);
-                        remindWater();
+                        timers.setTimer(userId, userName, 'water', interaction.locale);
                         break;
                     case 'both':
-                        usersToRemind.back.push(userName);
-                        usersToRemind.water.push(userName);
                         await userChoice.update({ 
                             content: 'I will remind you to straighten your back and drink every 30 minutes.',
                             components: [] });
-                        console.log(usersToRemind);
-
-                        const remindBoth = async () => {
-                            await interaction.user.send('Remember to straighten your back and drink some water !');
-                        };
                         
-                        timers.setTimer(userName, remindBoth, 30 * 60 * 1000);
-                        remindBoth();
+                        timers.setTimer(userId, userName, 'both', interaction.locale);
                         break;
                     case 'default':
                         break;

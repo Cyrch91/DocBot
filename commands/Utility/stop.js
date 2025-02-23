@@ -60,6 +60,7 @@ module.exports = {
                 }                
             } catch (error) {
                 console.log(error);
+                
                 await interaction.editReply({ 
                     content: 'An error occured or you did not answer in time. Please try again.',
                     components: [] 

@@ -54,6 +54,6 @@ for (const file of eventFiles) {
 
 setInterval(() => {
     checkTimers(client);
-}, 30 * 60 * 1000);
+}, 1 * 60 * 1000);
 
 client.login(process.env.TOKEN);

@@ -3,17 +3,15 @@ const { PresenceUpdateStatus } = require('discord.js');
 
 async function checkTimers(client) {
     const timersArray = timers.getTimers();
+    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit'}); // TODO : get current locale
+    const userToRemind = timersArray.filter(timer => timer.nextReminderTime === time);
     
-    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit'});
-
-    const userToRemind = timersArray.filter(timer => timer.nextRemindertime === time);
-
     for (const timer of userToRemind) {
         const user = await client.users.fetch(timer.userId);
         const guild = await client.guilds.fetch(process.env.GUILD_ID);
         const guildManager = await guild.members.fetch(timer.userId);
         const userGuildStatus = guildManager.presence.status;
-
+        
         switch (timer.type) {
             case 'back':
                 try {

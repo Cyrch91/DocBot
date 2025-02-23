@@ -18,21 +18,17 @@ class Timers {
     }
   
     setTimer(userId, userName, typeOfReminder) {
-      const now = new Date();
-    //   console.log(now);
-      
-      const interval = 0.5 * 60 * 1000; // 30 minutes in milliseconds
+      const now = new Date();   
+      const interval = 30 * 60 * 1000; // 30 minutes in milliseconds
       const nextReminderDateTime = new Date(now.getTime() + interval);
-      const nextReminderTime = nextReminderDateTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit'});
-    //   console.log(this.timers);
+      const nextReminderTime = nextReminderDateTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit'}); // TODO : get current locale
       
       this.timers.push({
         'userId': userId,
         'userName':userName,
-        'nextRemindertime': nextReminderTime,
+        'nextReminderTime': nextReminderTime,
         'type': typeOfReminder
       });
-    //   console.log(this.timers);
     }
 
     getTimers() {

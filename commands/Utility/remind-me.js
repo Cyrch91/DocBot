@@ -11,9 +11,7 @@ module.exports = {
         const userName = interaction.user.username;
         const timersArray = timers.getTimers();
         const isUserInList = timersArray.some(timer => timer.userId === userId);
-        console.log(isUserInList);
         
-        // if user is in the list
         if (isUserInList) {
             await interaction.reply({ 
                 content: 'You are already on the list !\nYou can remove yourself from the list with the "stop" command.',
@@ -51,7 +49,6 @@ module.exports = {
                     filter: collectorFilter,
                     time: 60_000
                 });
-                console.log(userChoice);
                 
                 switch (userChoice.customId) {
                     case 'back':
@@ -59,27 +56,27 @@ module.exports = {
                             content: 'I will remind you to straighten your back every 30 minutes.',
                             components: [] });
                         
-                        timers.setTimer(userId, userName, 'back', interaction.locale);
+                        timers.setTimer(userId, userName, 'back');
                         break;
                     case 'water':
                         await userChoice.update({ 
                             content: 'I will remind you to drink every 30 minutes.',
                             components: [] });
                         
-                        timers.setTimer(userId, userName, 'water', interaction.locale);
+                        timers.setTimer(userId, userName, 'water');
                         break;
                     case 'both':
                         await userChoice.update({ 
                             content: 'I will remind you to straighten your back and drink every 30 minutes.',
                             components: [] });
                         
-                        timers.setTimer(userId, userName, 'both', interaction.locale);
+                        timers.setTimer(userId, userName, 'both');
                         break;
                     case 'default':
                         break;
                 }
-            } catch (e) {
-                console.log(e);
+            } catch (error) {
+                console.log(error);
                 
                 await interaction.editReply({ 
                     content: 'Choice not received within 1 minute, cancelling',

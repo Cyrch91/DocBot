@@ -1,2 +1,6 @@
+## env
 .env.local
 .env
+
+## vendor
+node_modules/

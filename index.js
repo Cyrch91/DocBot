@@ -1,10 +1,9 @@
 require('dotenv').config();
-require('dotenv').config({ path: './.env.local' });
 const { checkTimers } = require('./tools/checkTimers');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { Client, Collection, GatewayIntentBits, PresenceUpdateStatus} = require('discord.js');
+const { Client, Collection, GatewayIntentBits} = require('discord.js');
 
 const client = new Client({ 
     intents: [
@@ -52,6 +51,7 @@ for (const file of eventFiles) {
 	}
 }
 
+// Setting up the timer to check every minute if someone needs to be reminded
 setInterval(() => {
     checkTimers(client);
 }, 1 * 60 * 1000);

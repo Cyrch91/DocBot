@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require("discord.js");
 
 const { timers } = require('../../src/domain/Timers');
 
@@ -49,32 +49,8 @@ module.exports = {
                     filter: collectorFilter,
                     time: 60_000
                 });
-                
-                switch (userChoice.customId) {
-                    case 'back':
-                        await userChoice.update({ 
-                            content: 'I will remind you to straighten your back every 30 minutes.',
-                            components: [] });
-                        
-                        timers.setTimer(userId, userName, 'back');
-                        break;
-                    case 'water':
-                        await userChoice.update({ 
-                            content: 'I will remind you to drink every 30 minutes.',
-                            components: [] });
-                        
-                        timers.setTimer(userId, userName, 'water');
-                        break;
-                    case 'both':
-                        await userChoice.update({ 
-                            content: 'I will remind you to straighten your back and drink every 30 minutes.',
-                            components: [] });
-                        
-                        timers.setTimer(userId, userName, 'both');
-                        break;
-                    case 'default':
-                        break;
-                }
+                const frequency = await frequencyChoice(userChoice, userChoice.customId);
+                timers.setTimer(userId, userName, userChoice.customId, frequency);
             } catch (error) {
                 console.log(error);
                 
@@ -86,3 +62,78 @@ module.exports = {
         }
     },
 };
+
+async function frequencyChoice(interaction,type) {
+    const frequency = new StringSelectMenuBuilder()
+        .setCustomId('frequency')
+        .setPlaceholder('Select the frequency at which you want to be reminded')
+        .addOptions([
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Every 15 minutes')
+                .setValue('15')
+                .setDescription('Every 15 minutes'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Every 30 minutes')
+                .setValue('30')
+                .setDescription('Every 30 minutes'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Every 45 minutes')
+                .setValue('45')
+                .setDescription('Every 45 minutes'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Every 60 minutes')
+                .setValue('60')
+                .setDescription('Every 60 minutes'),
+        ]);
+    const select = new ActionRowBuilder()
+        .addComponents(frequency);
+    
+    const response = await interaction.update({
+        content: 'Select the frequency at which you want to be reminded',
+        components: [select],
+        withResponse: true
+    });
+    
+    const collectorFilter = i => i.user.id === interaction.user.id;
+
+    try {
+        const frequencyChoice = await response.resource.message.awaitMessageComponent({
+            filter: collectorFilter,
+            time: 60_000
+        });
+        console.log(frequencyChoice);
+        
+        switch (type) {
+            case 'back':
+                await frequencyChoice.update({ 
+                    content: `I will remind you to straighten your back every ${frequencyChoice.values[0]} minutes.`,
+                    components: [] 
+                });
+                break;
+
+            case 'water':
+                await frequencyChoice.update({ 
+                    content: `I will remind you to drink every ${frequencyChoice.values[0]} minutes.`,
+                    components: [] 
+                });
+                break;
+            
+            case 'both':
+                await frequencyChoice.update({
+                    content: `I will remind you to straighten your back and drink every ${frequencyChoice.values[0]} minutes.`,
+                    components: []    
+                });
+                break;
+
+            default:
+                break;
+        }
+        return frequencyChoice.values[0];
+    } catch (error) {
+        console.log(error);
+        await interaction.editReply({ 
+            content: 'Choice not received within 1 minute, cancelling',
+            components: [] 
+        });
+    }
+}

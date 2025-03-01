@@ -2,7 +2,7 @@ const { timers } = require('../src/domain/Timers');
 const { PresenceUpdateStatus } = require('discord.js');
 
 async function checkTimers(client) {
-    const timersArray = timers.getTimers();
+    const timersArray = timers.getTimers();    
     const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit'}); // TODO : get current locale
     const userToRemind = timersArray.filter(timer => timer.nextReminderTime === time);
     
@@ -12,13 +12,12 @@ async function checkTimers(client) {
         const guildManager = await guild.members.fetch(timer.userId);
         const userGuildStatus = guildManager.presence.status;
         
-        switch (timer.type) {
+        switch (timer.type.typeOfReminder) {
             case 'back':
                 try {
                     if (PresenceUpdateStatus.Online === userGuildStatus) {
                         await user.send('Remember to straighten your back !');
-                        timers.cancelTimer(timer.userId);
-                        timers.setTimer(timer.userId, timer.userName, 'back');
+                        timers.updateTimer(timer.userId);
                     } else {
                         timers.cancelTimer(timer.userId);
                     }
@@ -31,8 +30,7 @@ async function checkTimers(client) {
                 try {
                     if (PresenceUpdateStatus.Online === userGuildStatus) {
                         await user.send('Remember to drink water !');
-                        timers.cancelTimer(timer.userId);
-                        timers.setTimer(timer.userId, timer.userName, 'water');
+                        timers.updateTimer(timer.userId);
                     } else {
                         timers.cancelTimer(timer.userId);
                     }
@@ -45,8 +43,7 @@ async function checkTimers(client) {
                 try {
                     if (PresenceUpdateStatus.Online === userGuildStatus) {
                         await user.send('Remember to straighten your back and drink water !');
-                        timers.cancelTimer(timer.userId);
-                        timers.setTimer(timer.userId, timer.userName, 'both');
+                        timers.updateTimer(timer.userId);
                     } else {
                         timers.cancelTimer(timer.userId);
                     }
